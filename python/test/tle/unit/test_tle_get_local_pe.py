@@ -7,28 +7,25 @@ DEVICE_MESH = tle.device_mesh(tle.MeshConfig(device=2))
 
 
 @triton.jit
-def _remote_peer_d2d_kernel(dev_comm_dptr, dev_mem_dptr, out_ptr, mesh: tl.constexpr, BLOCK: tl.constexpr):
+def _tle_local_pe_kernel(dev_comm_dptr, dev_mem_dptr, out_ptr, mesh: tl.constexpr, BLOCK: tl.constexpr):
+    pid = tl.program_id(0)  # noqa: F841
+    local_rank = tle.shard_id(mesh, 'device', comm_ptr=dev_comm_dptr)
+    n_rank = mesh.shape[0]
+    peer = (local_rank + 1) % n_rank  # noqa: F841
 
-    remote_mem = tle.remote(dev_mem_dptr, space="device", dtype=tl.float32, shard_id=0)
-    x = tl.load(remote_mem)
-    tl.store(out_ptr, x)
 
+class TestLocalPeCount:
 
-class TestDeviceToDevice:
-
-    def test_tle_d2d_remote(self):
+    def test_tle_local_pe_kernel(self):
         block = 64
         grid = 2
-
         N = 64
-
         with torch.cuda.use_mem_pool(tle.get_mem_pool()):
             x = torch.randn((N, N), dtype=torch.float32, device="cuda")
         y = torch.empty_like(x)
-
         dev_comm_dptr, dev_mem_dptr = tle.create_comm_tensor(x)
 
-        compiled = _remote_peer_d2d_kernel.warmup(
+        compiled = _tle_local_pe_kernel.warmup(
             dev_comm_dptr=dev_comm_dptr,
             dev_mem_dptr=dev_mem_dptr,
             out_ptr=y,
@@ -38,13 +35,12 @@ class TestDeviceToDevice:
             num_ctas=1,
             num_warps=4,
         )
-        assert "remote_pointers" in compiled.asm["ttgir"]
-        assert "flagcxGetIntraPointerC" in compiled.asm['ptx']
+        assert "get_device_id" in compiled.asm["ttgir"]
 
-        _remote_peer_d2d_kernel[(grid, )](dev_comm_dptr=dev_comm_dptr, dev_mem_dptr=dev_mem_dptr, out_ptr=y,
-                                          mesh=DEVICE_MESH, BLOCK=block)
+        _tle_local_pe_kernel[(grid, )](dev_comm_dptr=dev_comm_dptr, dev_mem_dptr=dev_mem_dptr, out_ptr=y,
+                                       mesh=DEVICE_MESH, BLOCK=block)
 
         tle.cleanup_communicator()
 
 
-TestDeviceToDevice().test_tle_d2d_remote()
+TestLocalPeCount().test_tle_local_pe_kernel()
