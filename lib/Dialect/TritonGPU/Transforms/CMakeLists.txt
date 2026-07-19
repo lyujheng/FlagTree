@@ -39,6 +39,7 @@ add_triton_library(TritonGPUTransforms
   RemoveLayoutConversions.cpp
   ReorderInstructions.cpp
   CoalesceAsyncCopy.cpp
+  OpStats.cpp
   Utility.cpp
   CoalesceUtils.cpp
   LayoutPropagationUtility.cpp

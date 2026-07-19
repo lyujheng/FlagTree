@@ -352,4 +352,9 @@ def TritonGPUCoalesceAsyncCopy: Pass<"tritongpu-coalesce-async-copy", "mlir::Mod
                            "mlir::triton::TritonDialect"];
 }
 
+def TritonGPUOpStats: Pass<"tritongpu-op-stats", "mlir::ModuleOp">{
+  let summary = "Print statistics about ops and encodings in the module";
+  let description = "Walk through all ops in the module and print the count of each op type and encoding distribution.";
+}
+
 #endif
