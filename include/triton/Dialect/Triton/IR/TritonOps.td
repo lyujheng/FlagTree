@@ -1439,5 +1439,18 @@ def TT_DescriptorScatterOp : TT_Op<"descriptor_scatter", [TT_DescriptorStoreLike
   let hasVerifier = 1;
 }
 
+def TT_MyReluOp : TT_Op<"my_relu", [Elementwise,
+                                         SameOperandsAndResultShape,
+                                         SameOperandsAndResultEncoding,
+                                         Pure]> {
+    let summary = "Elementwise ReLU: max(x, 0)";
+
+    let arguments = (ins TT_FloatLike:$src);
+
+    let results = (outs TT_FloatLike:$result);
+
+    let assemblyFormat = "$src attr-dict `:` type($src) `->` type($result)";
+}
+
 
 #endif // Triton_OPS
