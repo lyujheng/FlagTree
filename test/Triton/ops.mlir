@@ -289,6 +289,6 @@ tt.func @unsplat(%arg0: tensor<1x1xf32>) -> f32 {
 // CHECK-LABEL: @my_relu
 tt.func @my_relu(%arg0: tensor<128xf32>) -> tensor<128xf32> {
   // CHECK: tt.my_relu
-  %result = tt.my_relu %arg0 : tensor<128xf32> -> tensor<128xf32>
+  %result = tt.my_relu %arg0 : tensor<128xf32>
   tt.return %result : tensor<128xf32>
 }

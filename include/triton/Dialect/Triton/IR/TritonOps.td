@@ -1440,8 +1440,7 @@ def TT_DescriptorScatterOp : TT_Op<"descriptor_scatter", [TT_DescriptorStoreLike
 }
 
 def TT_MyReluOp : TT_Op<"my_relu", [Elementwise,
-                                         SameOperandsAndResultShape,
-                                         SameOperandsAndResultEncoding,
+                                         SameOperandsAndResultType,
                                          Pure]> {
     let summary = "Elementwise ReLU: max(x, 0)";
 
@@ -1449,7 +1448,7 @@ def TT_MyReluOp : TT_Op<"my_relu", [Elementwise,
 
     let results = (outs TT_FloatLike:$result);
 
-    let assemblyFormat = "$src attr-dict `:` type($src) `->` type($result)";
+    let assemblyFormat = "$src attr-dict `:` type($src)";
 }
 
 

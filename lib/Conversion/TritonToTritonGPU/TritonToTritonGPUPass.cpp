@@ -635,6 +635,7 @@ void populateTritonPatterns(TritonGPUTypeConverter &typeConverter,
       GenericOpPattern<triton::DotScaledOp>,
       GenericOpPattern<triton::CallOp>,
       GenericOpPattern<ReturnOp>,
+      GenericOpPattern<triton::MyReluOp>,
       TritonFuncOpPattern
       // clang-format on
       >(typeConverter, context);
