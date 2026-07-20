@@ -640,6 +640,22 @@ struct MapElementwiseOpConversion
   }
 };
 
+struct MyReluOpConversion
+  : ElementwiseOpConversionBase<triton::MyReluOp, MyReluOpConversion> {
+  using Base = ElementwiseOpConversionBase<triton::MyReluOp, MyReluOpConversion>;
+  using Base::Base;
+  using Adaptor = typename Base::OpAdaptor;
+
+  SmallVector<Value> createDestOps(triton::MyReluOp op, OpAdaptor adaptor,
+                                    ConversionPatternRewriter &rewriter,
+                                    Type elemTy, MultipleOperandsRange operands,
+                                    Location loc) const {
+    auto zero = LLVM::ConstantOp::create(rewriter, loc, rewriter.getFloatAttr(elemTy, 0.0));
+
+    return {LLVM::MaxNumOp::create(rewriter, loc, elemTy, operands[0][0], zero)};
+  }
+};
+
 } // namespace
 
 void mlir::triton::populateMinMaxFOpToLLVMPattern(
@@ -732,4 +748,5 @@ void mlir::triton::populateElementwiseOpToLLVMPatterns(
   patterns.add<AbsFOpConversion>(typeConverter, axisInfoAnalysis, benefit);
   patterns.add<SelectOpConversion>(typeConverter, axisInfoAnalysis, benefit);
   patterns.add<MapElementwiseOpConversion>(typeConverter, benefit);
+  patterns.add<MyReluOpConversion>(typeConverter, axisInfoAnalysis, benefit);
 }
