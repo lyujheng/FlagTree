@@ -1439,5 +1439,17 @@ def TT_DescriptorScatterOp : TT_Op<"descriptor_scatter", [TT_DescriptorStoreLike
   let hasVerifier = 1;
 }
 
+def TT_MyLeakyReluOp : TT_Op<"my_leaky_relu", 
+                              [Elementwise, 
+                               SameOperandsAndResultType,
+                               Pure]> {
+  let summary = "Elementwise Leaky ReLU: x > 0 ? x : aplha * x";
+
+  let arguments = (ins TT_FloatLike:$src, F32Attr:$alpha);
+
+  let results = (outs TT_FloatLike:$result);
+
+  let assemblyFormat = "$src attr-dict `:` type($src)";
+}
 
 #endif // Triton_OPS

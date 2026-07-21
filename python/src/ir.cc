@@ -1882,6 +1882,10 @@ void init_triton_ir(py::module &&m) {
                                                   tensorShape, isSignedInteger,
                                                   paddingOption);
            })
+      .def("create_my_leaky_relu",
+           [](TritonOpBuilder &self, Value &val, float alpha) -> Value {
+             return self.create<triton::MyLeakyReluOp>(val, APFloat(alpha));
+           })
 
       ;
 

@@ -247,3 +247,12 @@ def fma(x, y, z, _semantic=None):
     z, x = core.binary_op_type_legalization(z, x, _semantic)
     z, y = core.binary_op_type_legalization(z, y, _semantic)
     return core.tensor(_semantic.builder.create_fma(x.handle, y.handle, z.handle), x.type)
+
+
+@core.builtin
+@_add_math_2arg_docstr("elementwise leaky relu")
+def my_leaky_relu(x, alpha=0.01, _semantic=None):
+    x = _semantic.to_tensor(x)
+    if isinstance(alpha, core.constexpr):
+        alpha = alpha.value
+    return core.tensor(_semantic.builder.create_my_leaky_relu(x.handle, alpha), x.type)

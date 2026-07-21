@@ -640,6 +640,30 @@ struct MapElementwiseOpConversion
   }
 };
 
+struct MyLeakyReluOpConversion
+  : ElementwiseOpConversionBase<triton::MyLeakyReluOp, MyLeakyReluOpConversion> {
+  using Base = ElementwiseOpConversionBase<triton::MyLeakyReluOp, MyLeakyReluOpConversion>;
+  using Base::Base;
+  using Adaptor = typename Base::OpAdaptor;
+
+  SmallVector<Value> createDestOps(triton::MyLeakyReluOp op, OpAdaptor adaptor,
+                                    ConversionPatternRewriter &rewriter,
+                                    Type elemTy, MultipleOperandsRange operands,
+                                    Location loc) const {
+    auto zero = LLVM::ConstantOp::create(rewriter, loc, rewriter.getFloatAttr(elemTy, 0.0));
+    float alphaValue = op.getAlpha().convertToFloat();
+    auto alpha = LLVM::ConstantOp::create(rewriter, loc, rewriter.getFloatAttr(elemTy, alphaValue));
+
+    auto x = operands[0][0];
+    auto cmp = LLVM::FCmpOp::create(rewriter, loc, LLVM::FCmpPredicate::ogt, x, zero);
+    auto mul = LLVM::FMulOp::create(rewriter, loc, elemTy, x, alpha);
+    auto ret = LLVM::SelectOp::create(rewriter, loc, cmp, x, mul);
+
+    return {ret};
+  }
+
+};
+
 } // namespace
 
 void mlir::triton::populateMinMaxFOpToLLVMPattern(
@@ -732,4 +756,5 @@ void mlir::triton::populateElementwiseOpToLLVMPatterns(
   patterns.add<AbsFOpConversion>(typeConverter, axisInfoAnalysis, benefit);
   patterns.add<SelectOpConversion>(typeConverter, axisInfoAnalysis, benefit);
   patterns.add<MapElementwiseOpConversion>(typeConverter, benefit);
+  patterns.add<MyLeakyReluOpConversion>(typeConverter, axisInfoAnalysis, benefit);
 }
