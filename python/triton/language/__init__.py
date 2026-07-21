@@ -122,7 +122,7 @@ from .core import (
     where,
 )
 from .math import (umulhi, exp, exp2, fma, log, log2, cos, rsqrt, sin, sqrt, sqrt_rn, abs, fdiv, div_rn, erf, floor,
-                   ceil)
+                   ceil, my_relu)
 from .random import (
     pair_uniform_to_normal,
     philox,
@@ -279,6 +279,7 @@ __all__ = [
     "xor_sum",
     "zeros",
     "zeros_like",
+    "my_relu",
 ]
 
 

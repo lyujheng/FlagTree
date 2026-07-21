@@ -1882,7 +1882,10 @@ void init_triton_ir(py::module &&m) {
                                                   tensorShape, isSignedInteger,
                                                   paddingOption);
            })
-
+      .def("create_my_relu",
+           [](TritonOpBuilder &self, Value &val) -> Value {
+             return self.create<triton::MyReluOp>(val);
+           })
       ;
 
   py::class_<PassManager>(m, "pass_manager", py::module_local())

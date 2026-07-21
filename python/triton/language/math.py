@@ -247,3 +247,10 @@ def fma(x, y, z, _semantic=None):
     z, x = core.binary_op_type_legalization(z, x, _semantic)
     z, y = core.binary_op_type_legalization(z, y, _semantic)
     return core.tensor(_semantic.builder.create_fma(x.handle, y.handle, z.handle), x.type)
+
+
+@core.builtin
+@_add_math_1arg_docstr("elementwise ReLU")
+def my_relu(x, _semantic=None):
+    x = _semantic.to_tensor(x)
+    return core.tensor(_semantic.builder.create_my_relu(x.handle), x.type)
