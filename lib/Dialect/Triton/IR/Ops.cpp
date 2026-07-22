@@ -1473,5 +1473,13 @@ LogicalResult DescriptorStoreOp::verify() {
                                        getSrc().getType());
 }
 
+// -- MyReluOp -- 
+OpFoldResult MyReluOp::fold(FoldAdaptor adaptor) {
+  if (auto innerRelu = getSrc().getDefiningOp<MyReluOp>()) {
+    return innerRelu.getResult();
+  }
+  return {};
+}
+
 } // namespace triton
 } // namespace mlir

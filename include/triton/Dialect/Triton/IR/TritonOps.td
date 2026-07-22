@@ -1449,6 +1449,8 @@ def TT_MyReluOp : TT_Op<"my_relu", [Elementwise,
     let results = (outs TT_FloatLike:$result);
 
     let assemblyFormat = "$src attr-dict `:` type($src)";
+
+    let hasFolder = 1;
 }
 
 
