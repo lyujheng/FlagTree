@@ -1481,5 +1481,31 @@ OpFoldResult MyReluOp::fold(FoldAdaptor adaptor) {
   return {};
 }
 
+struct RemoveRedundantMyRelu : public OpRewritePattern<MyReluOp> {
+  using OpRewritePattern::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(MyReluOp op, 
+                                PatternRewriter &rewriter) const override {
+    if (auto constOp = op.getSrc().getDefiningOp<arith::ConstantOp>()) {
+      if (auto attr = dyn_cast<DenseFPElementsAttr>(constOp.getValue())) {
+        bool allNonNeg = llvm::all_of(attr.getValues<APFloat>(), [](APFloat v) {
+          return !v.isNegative();
+        });
+
+        if (allNonNeg) {
+          rewriter.replaceOp(op, op.getSrc());
+          return success();
+        }
+      }
+    }
+    return failure();
+  }
+};
+
+void MyReluOp::getCanonicalizationPatterns(RewritePatternSet &results,
+                                           MLIRContext *context) {
+  results.add<RemoveRedundantMyRelu>(context);
+}
+
 } // namespace triton
 } // namespace mlir

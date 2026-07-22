@@ -1451,6 +1451,8 @@ def TT_MyReluOp : TT_Op<"my_relu", [Elementwise,
     let assemblyFormat = "$src attr-dict `:` type($src)";
 
     let hasFolder = 1;
+
+    let hasCanonicalizer = 1;
 }
 
 
