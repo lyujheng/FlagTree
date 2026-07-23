@@ -120,6 +120,7 @@ from .core import (
     view,
     void,
     where,
+    my_reduce_sum,
 )
 from .math import (umulhi, exp, exp2, fma, log, log2, cos, rsqrt, sin, sqrt, sqrt_rn, abs, fdiv, div_rn, erf, floor,
                    ceil)
@@ -279,6 +280,7 @@ __all__ = [
     "xor_sum",
     "zeros",
     "zeros_like",
+    "my_reduce_sum",
 ]
 
 

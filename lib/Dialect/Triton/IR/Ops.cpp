@@ -1473,5 +1473,45 @@ LogicalResult DescriptorStoreOp::verify() {
                                        getSrc().getType());
 }
 
+// -- MyReduceSumOp --
+LogicalResult MyReduceSumOp::inferReturnTypes(
+  MLIRContext* context, std::optional<Location> loc, ValueRange operands,
+  DictionaryAttr attributes, OpaqueProperties properties, RegionRange regions,
+  SmallVectorImpl<Type>& inferredReturnTypes) {
+  auto srcType = cast<RankedTensorType>(operands[0].getType());
+  auto srcShape = srcType.getShape();
+
+  Properties *prop = properties.as<Properties *>();
+  int axis = prop->axis.getInt();
+
+  SmallVector<int64_t> resultShape;
+  for (int i = 0; i < (int)srcShape.size(); ++i)
+  {
+    if (axis != i)
+    {
+      resultShape.push_back(srcShape[i]);
+    }
+  }
+
+  if (resultShape.empty()) {
+    // 1D -> scalar
+    inferredReturnTypes.push_back(srcType.getElementType());
+  } else {
+    Attribute srcEncoding = srcType.getEncoding();
+    Attribute retEncoding;
+    if (srcEncoding) {
+      Dialect &dialect = srcEncoding.getDialect();
+      auto inferLayoutInterface = cast<DialectInferLayoutInterface>(&dialect);
+      if (failed(inferLayoutInterface->inferReduceOpEncoding(
+              srcEncoding, axis, retEncoding, loc))) {
+        return failure();
+      }
+    }
+    inferredReturnTypes.push_back(
+        RankedTensorType::get(resultShape, srcType.getElementType(), retEncoding));
+  }
+  return success();
+}
+
 } // namespace triton
 } // namespace mlir

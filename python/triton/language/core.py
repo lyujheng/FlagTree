@@ -2702,6 +2702,10 @@ def _reduce_with_indices(input, axis, combine_fn, keep_dims=False, _semantic=Non
     return rvalue, rindices
 
 
+@builtin
+def my_reduce_sum(input, axis=0, _semantic=None, _generator=None):
+    return _semantic.my_reduce_sum(input, axis)
+
 # -----------------------
 # Scans
 # -----------------------

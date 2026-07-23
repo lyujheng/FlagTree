@@ -108,6 +108,12 @@ unsigned defaultAllocationAnalysisScratchSizeFn(Operation *op) {
     constexpr int32_t kTMASize = 128;
     return kTMASize;
   }
+  if (auto myReduceOp = dyn_cast<MyReduceSumOp>(op)) {
+    auto srcTy = cast<RankedTensorType>(myReduceOp.getSrc().getType());
+    unsigned numWarps = gpu::lookupNumWarps(op);
+    unsigned elemBytes = srcTy.getElementTypeBitWidth() / 8;
+    return numWarps * elemBytes;
+  }
   return 0;
 }
 

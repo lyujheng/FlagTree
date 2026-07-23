@@ -1716,6 +1716,16 @@ class TritonSemantic(Generic[TensorTy]):
         return tuple(
             self.wrap_tensor(reduce_op.get_result(i), inputs[i].type.scalar, ret_shape) for i in range(len(inputs)))
 
+    def my_reduce_sum(self, input: TensorTy, axis: int) -> TensorTy:
+        if axis is None:
+            input = self.reshape(input, [input.name.value], can_reorder=True)
+            axis = 0
+
+        shape = input.type.shape
+        ret_shape = [s for i, s in enumerate(shape) if i != axis]
+        reduce_op = self.builder.create_my_reduce_sum(input.handle, axis)
+        return self.wrap_tensor(reduce_op.get_result(0), input.type.scalar, ret_shape)
+
 # ===----------------------------------------------------------------------===
 #                               Associative Scan
 # ===----------------------------------------------------------------------===

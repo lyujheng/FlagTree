@@ -1882,6 +1882,10 @@ void init_triton_ir(py::module &&m) {
                                                   tensorShape, isSignedInteger,
                                                   paddingOption);
            })
+      .def("create_my_reduce_sum",
+           [](TritonOpBuilder& self, Value operand, uint32_t axis) -> OpState {
+            return self.create<MyReduceSumOp>(operand, axis);
+           })
 
       ;
 

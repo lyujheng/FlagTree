@@ -578,6 +578,18 @@ public:
   }
 };
 
+struct TritonMyReduceSumPattern : public OpConversionPattern<triton::MyReduceSumOp> {
+  using OpConversionPattern::OpConversionPattern;
+
+  LogicalResult matchAndRewrite(triton::MyReduceSumOp op, OpAdaptor adaptor,
+                                  ConversionPatternRewriter &rewriter) const override {
+    auto newOp = triton::MyReduceSumOp::create(rewriter, op.getLoc(),
+                                                adaptor.getSrc(), op.getAxis());
+    rewriter.replaceOp(op, newOp.getResult());
+    return success();
+  }
+};
+
 void populateTritonPatterns(TritonGPUTypeConverter &typeConverter,
                             RewritePatternSet &patterns, unsigned numCTAs) {
   MLIRContext *context = patterns.getContext();
@@ -635,6 +647,7 @@ void populateTritonPatterns(TritonGPUTypeConverter &typeConverter,
       GenericOpPattern<triton::DotScaledOp>,
       GenericOpPattern<triton::CallOp>,
       GenericOpPattern<ReturnOp>,
+      TritonMyReduceSumPattern,
       TritonFuncOpPattern
       // clang-format on
       >(typeConverter, context);

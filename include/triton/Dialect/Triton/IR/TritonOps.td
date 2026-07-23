@@ -1439,5 +1439,15 @@ def TT_DescriptorScatterOp : TT_Op<"descriptor_scatter", [TT_DescriptorStoreLike
   let hasVerifier = 1;
 }
 
+def TT_MyReduceSumOp : TT_Op<"my_reduce_sum", 
+                              [Pure, DeclareOpInterfaceMethods<InferTypeOpInterface>]> {
+  let summary = "Reduction sum along an axis";
+
+  let arguments = (ins TT_FloatLike:$src, I32Attr:$axis);
+
+  let results = (outs TT_FloatLike:$result);
+
+  let assemblyFormat = "$src attr-dict `:` type($src) `->` type($result)";
+}
 
 #endif // Triton_OPS

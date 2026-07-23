@@ -107,6 +107,11 @@ void populateInstrumentationToLLVMPatterns(LLVMTypeConverter &typeConverter,
                                            RewritePatternSet &patterns,
                                            PatternBenefit benefit);
 
+void populateMyReduceSumOpToLLVMPatterns(LLVMTypeConverter &typeConverter,
+                                         RewritePatternSet &patterns,
+                                         const TargetInfoBase &targetInfo,
+                                         PatternBenefit benefit);
+
 } // namespace triton
 } // namespace mlir
 
